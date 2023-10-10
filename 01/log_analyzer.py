@@ -18,21 +18,23 @@ config = {
     "LOG_DIR": "./log"
 }
 
-logging.basicConfig(level=logging.WARNING)
+def log_config(log_path):
+    logging.basicConfig(level=logging.WARNING)
+    sys_logger = logging.getLogger("system_logger")
+    sys_logger_filename = log_path
+    sys_logger_format = '[{asctime}] {levelname} {message}'
+    sys_logger_level = logging.DEBUG
+    sys_logger_formatter = logging.Formatter(sys_logger_format, style='{')
+    console_handle = logging.StreamHandler()
+    console_handle.setLevel(sys_logger_level)
+    console_handle.setFormatter(sys_logger_formatter)
+    file_handle = logging.handlers.RotatingFileHandler(sys_logger_filename)
+    file_handle.setFormatter(sys_logger_formatter)
+    file_handle.setLevel(sys_logger_level)
+    sys_logger.addHandler(console_handle)
+    sys_logger.addHandler(file_handle)
+    return sys_logger
 
-sys_logger = logging.getLogger("system_logger")
-sys_logger_filename='./parse_log.txt'
-sys_logger_format='[%(asctime)s] %(levelname).1s %(message)s'
-sys_logger_level=logging.DEBUG
-sys_logger_formatter = logging.Formatter(sys_logger_format)
-console_handle = logging.StreamHandler()
-console_handle.setLevel(sys_logger_level)
-console_handle.setFormatter(sys_logger_formatter)
-file_handle = logging.handlers.RotatingFileHandler(sys_logger_filename)
-file_handle.setFormatter(sys_logger_formatter)
-file_handle.setLevel(sys_logger_level)
-sys_logger.addHandler(console_handle)
-sys_logger.addHandler(file_handle)
 
 log_req_time_total = 0.0
 log_counter = {}
@@ -69,17 +71,17 @@ def log_string_parse(log_str: str):
         url = str(url)
         time = float(time)
         log_req_time_total += time
-        sys_logger.log(logging.INFO, "Log string: " + log_str)
-        sys_logger.log(logging.INFO, "Log parse url string: " + url + " access time:" + str(time))
+        log.info("Log string: " + log_str)
+        log.info("Log parse url string: " + url + " access time:" + str(time))
     except IndexError as e:
-        sys_logger.log(logging.WARNING, "Wrong string format: " + log_str)
+        log.warning("Wrong string format: " + log_str)
     return url, time
 
 def log_statistics(log_limit: int):
     url_stat = []
     for key, val in log_counter.items():
         times = val
-        sys_logger.log(logging.INFO, "Log stats. URL: " + str(key) + " list time: " + str(times))
+        log.info("Log stats. URL: " + str(key) + " list time: " + str(times))
         url_stat.append({
             'url': key,
             'count': len(times),
@@ -125,11 +127,11 @@ def log_read_conf(conf_file: str):
             fp = json.load(f_conf)
     except (FileNotFoundError, JSONDecodeError) as ex:
         if ex == FileNotFoundError:
-            sys_logger.log(logging.ERROR, f"File not found: {conf_file}")
+            log.error(f"File not found: {conf_file}")
         elif ex == JSONDecodeError:
-            sys_logger.log(logging.ERROR, "Wrong format, must be json.")
+            log.error("Wrong format, must be json.")
         else:
-            sys_logger.log(logging.ERROR, ex)
+            log.error(ex)
     if fp:
         return fp
     else:
@@ -139,7 +141,10 @@ def main():
     current_config = log_read_conf(log_args())
     file = log_file(current_config['LOG_DIR'])
     full_path = Path().joinpath(current_config['LOG_DIR'], file.name)
-    if file:
+    report = Path(f"{current_config['REPORT_DIR']}/report-{file.date}.html")
+
+    # Если есть лог и нет отчета, запускаем парсинг
+    if file and not report.exists():
         for log_str in log_get(full_path):
             l_url, l_time = log_string_parse(log_str)
             if l_url in log_counter:
@@ -152,4 +157,5 @@ def main():
 
 
 if __name__ == "__main__":
+    log = log_config("./parse_log.txt")
     main()
