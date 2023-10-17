@@ -87,7 +87,7 @@ api_token_ip = conf.get('api_token_ip')
 api_token_weather = conf.get('api_token_weather')
 log_path = conf.get('log_path') or default_log_path
 log = server_log_config(log_path)
-#loop = asyncio.run(get_weather(ip)
+# loop = asyncio.run(get_weather(ip)
 
 # 'REQUEST_METHOD': 'GET',
 # 'REQUEST_URI': '/ip2w',

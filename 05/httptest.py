@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 import sys
-v3 = sys.version_info[0] == 3
-
 import re
 import socket
+import unittest
+
+v3 = sys.version_info[0] == 3
 if v3:
     import http.client as httplib
 else:
     import httplib
-import unittest
+
 
 class HttpServer(unittest.TestCase):
     host = "localhost"
@@ -26,16 +27,15 @@ class HttpServer(unittest.TestCase):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.host, self.port))
         if v3:
-          s.sendall(b"\n")
+            s.sendall(b"\n")
         else:
-          s.sendall("\n")
+            s.sendall("\n")
         s.close()
 
     def test_server_header(self):
         """Server header exists"""
         self.conn.request("GET", "/httptest/")
         r = self.conn.getresponse()
-        data = r.read()
         server = r.getheader("Server")
         self.assertIsNotNone(server)
 
@@ -57,14 +57,12 @@ class HttpServer(unittest.TestCase):
         """directory index file absent"""
         self.conn.request("GET", "/httptest/dir1/")
         r = self.conn.getresponse()
-        data = r.read()
         self.assertEqual(int(r.status), 404)
 
     def test_file_not_found(self):
         """absent file returns 404"""
         self.conn.request("GET", "/httptest/smdklcdsmvdfjnvdfjvdfvdfvdsfssdmfdsdfsd.html")
         r = self.conn.getresponse()
-        data = r.read()
         self.assertEqual(int(r.status), 404)
 
     def test_file_in_nested_folders(self):
@@ -86,7 +84,6 @@ class HttpServer(unittest.TestCase):
         """slash after filename"""
         self.conn.request("GET", "/httptest/dir2/page.html/")
         r = self.conn.getresponse()
-        data = r.read()
         self.assertEqual(int(r.status), 404)
 
     def test_file_with_query_string(self):
@@ -153,7 +150,6 @@ class HttpServer(unittest.TestCase):
         """document root escaping forbidden"""
         self.conn.request("GET", "/httptest/../../../../../../../../../../../../../etc/passwd")
         r = self.conn.getresponse()
-        data = r.read()
         self.assertIn(int(r.status), (400, 403, 404))
 
     def test_file_with_dot_in_name(self):
@@ -173,7 +169,6 @@ class HttpServer(unittest.TestCase):
         """post method forbidden"""
         self.conn.request("POST", "/httptest/dir2/page.html")
         r = self.conn.getresponse()
-        data = r.read()
         self.assertIn(int(r.status), (400,405))
 
     def test_head_method(self):
@@ -207,17 +202,17 @@ class HttpServer(unittest.TestCase):
 
         statusline = headers.pop(0)
         if v3:
-            (proto, code, status) = statusline.split(b" ");
+            (proto, code, status) = statusline.split(b" ")
         else:
-            (proto, code, status) = statusline.split(" ");
+            (proto, code, status) = statusline.split(" ")
         h = {}
         for k,v in enumerate(headers):
             if v3:
                 (name, value) = re.split(br'\s*:\s*', v, 1)
             else:
                 (name, value) = re.split(r'\s*:\s*', v, 1)
-        h[name] = value
-        if (int(code) == 200):
+            h[name] = value
+        if int(code) == 200:
             if v3:
                 self.assertEqual(int(h[b'Content-Length']), 38)
             else:

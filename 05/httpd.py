@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 
 
-#from multiprocessing import pool
+# from multiprocessing import pool
 
 def server_log_config(log_path):
     log_path = Path(log_path)
@@ -46,7 +46,8 @@ class SenderThread(Thread):
     def run(self):
         while True:
             item = self.input_queue.get()
-            if item is None: break
+            if item is None:
+                break
             sock, msg, bodyfile = item
 
             try:
@@ -72,7 +73,7 @@ class HTTPServer:
         self.root = Path(root_folder).resolve()
         self.index = "index.html"
         self.srv_socket = None
-        self.socket_poll_timeout = 100 # in ms
+        self.socket_poll_timeout = 100    # in ms
         self.serve_req = re.compile("^[GET|POST|HEAD]+ .* HTTP/1.[0|1]+\r\n.*")
         self.clients = []
         self.to_clients = SenderThread(workers)
@@ -175,7 +176,7 @@ class HTTPServer:
                     client['socket'].close()
                 log.error("Error %s", ex)
 
-    def get_req_info(self,data):
+    def get_req_info(self, data):
         data_splitted = data.split('\n')[0].split(' ')
         method = data_splitted[0]
         path = str(' ').join(data_splitted[1:-1])
@@ -217,7 +218,7 @@ class HTTPServer:
             mime = mimetypes.guess_type(filepath)[0]
             if mime:
                 header['Content-Type'] = mime
-        return "\r\n".join([f"{key}: {val}" for key,val in header.items()])
+        return "\r\n".join([f"{key}: {val}" for key, val in header.items()])
 
     def response(self, sock, requset):
         log.debug(requset)
