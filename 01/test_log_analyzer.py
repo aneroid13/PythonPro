@@ -1,6 +1,7 @@
 import unittest
 import typing
-from log_analyzer import *
+import os
+from log_analyzer import log_file, log_get, log_args, log_read_conf, log_string_parse, log_statistics, log_report, config
 
 class Test(unittest.TestCase):
     def setUp(self):

@@ -189,20 +189,20 @@ class HttpServer(unittest.TestCase):
             data = ""
         while 1:
             buf = s.recv(10240)
-            #if not buf: break
+#            #if not buf: break
             data += buf
             break
         s.close()
 
         if v3:
             self.assertTrue(data.find(b"\r\n\r\n") > 0, "no empty line with CRLF found")
-            (head, body) = re.split(b"\r\n\r\n", data, 1);
-            headers = head.split(b"\r\n");
+            (head, body) = re.split(b"\r\n\r\n", data, 1)
+            headers = head.split(b"\r\n")
             self.assertTrue(len(headers) > 0, "no headers found")
         else:
             self.assertTrue(data.find("\r\n\r\n") > 0, "no empty line with CRLF found")
-            (head, body) = re.split("\r\n\r\n", data, 1);
-            headers = head.split("\r\n");
+            (head, body) = re.split("\r\n\r\n", data, 1)
+            headers = head.split("\r\n")
             self.assertTrue(len(headers) > 0, "no headers found")
 
         statusline = headers.pop(0)
@@ -213,9 +213,9 @@ class HttpServer(unittest.TestCase):
         h = {}
         for k,v in enumerate(headers):
             if v3:
-                (name, value) = re.split(b'\s*:\s*', v, 1)
+                (name, value) = re.split(br'\s*:\s*', v, 1)
             else:
-                (name, value) = re.split('\s*:\s*', v, 1)
+                (name, value) = re.split(r'\s*:\s*', v, 1)
         h[name] = value
         if (int(code) == 200):
             if v3:
@@ -322,20 +322,22 @@ class HttpServer(unittest.TestCase):
         self.assertEqual(len(data), 35344)
         self.assertEqual(ctype, "application/x-shockwave-flash")
 
+
 loader = unittest.TestLoader()
 suite = unittest.TestSuite()
 a = loader.loadTestsFromTestCase(HttpServer)
 suite.addTest(a)
+
 
 class NewResult(unittest.TextTestResult):
     def getDescription(self, test):
         doc_first_line = test.shortDescription()
         return doc_first_line or ""
 
+
 class NewRunner(unittest.TextTestRunner):
     resultclass = NewResult
 
+
 runner = NewRunner(verbosity=2)
 runner.run(suite)
-
-

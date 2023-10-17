@@ -23,18 +23,18 @@ def server_log_config(log_path: str):
     logger_srv.addHandler(fh)
     return logger_srv
 
-### Log format
-## {"api_token_ip": "xxx",
-## api_token_weather": "xxx",
-## "log_path": "/var/log/ip2w/ip2w.log"}
+# Log format
+# {"api_token_ip": "xxx",
+# api_token_weather": "xxx",
+# "log_path": "/var/log/ip2w/ip2w.log"}
 def conf_reader(conf_file: str):
     fp = None
     try:
         with open(conf_file, 'rt') as f_conf:
             fp = json.load(f_conf)
-    except FileNotFoundError as ex:
+    except FileNotFoundError:
         log.error(f"File not found: {conf_file}")
-    except json.JSONDecodeError as ex:
+    except json.JSONDecodeError:
         log.error("Wrong format, must be json.")
     except Exception as ex:
         log.error(f"Error: {ex}")

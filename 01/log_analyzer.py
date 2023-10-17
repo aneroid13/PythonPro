@@ -42,8 +42,8 @@ log_counter = {}
 def log_file(dir):
     max_date = 0
     log_name = None
-    reg_name = "^nginx-access-ui\.log-(\d{8})\.*(gz)*$"
-    fname = namedtuple("Log_filename", ['name','date','ext'])
+    reg_name = r"^nginx-access-ui\.log-(\d{8})\.*(gz)*$"
+    fname = namedtuple("Log_filename", ['name', 'date', 'ext'])
     for name in os.listdir(dir):
         get_name = regex.findall(reg_name, name)
         if get_name:
@@ -64,7 +64,7 @@ def log_get(logf):
 def log_string_parse(log_str: str):
     global log_req_time_total
     url, time = "", 0.0
-    tmpl = regex.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} .* \"(?:GET|POST|DELETE|PUT|HEAD|OPTIONS|-) (.*) HTTP/\d.\d\".* (\d+\.\d*)$")
+    tmpl = regex.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} .* \"(?:GET|POST|DELETE|PUT|HEAD|OPTIONS|-) (.*) HTTP/\d.\d\".* (\d+\.\d*)$")
 
     try:
         url, time = regex.findall(tmpl, log_str)[0]
