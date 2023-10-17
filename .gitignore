@@ -2,4 +2,5 @@
 **/out
 01/log/*
 01/reports/*
+01/parse_log.txt
 05/log/*

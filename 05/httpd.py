@@ -1,8 +1,6 @@
 import datetime
-import urllib.parse
+from urllib.parse import urlparse, unquote
 from socket import *
-import json
-import time
 import argparse
 import select
 import mimetypes
@@ -11,7 +9,6 @@ from threading import Thread
 import logging
 import logging.handlers
 from pathlib import Path
-from urllib.parse import urlparse
 import re
 
 
@@ -180,9 +177,6 @@ class HTTPServer:
                     client['socket'].close()
                 log.error("Error %s", ex)
 
-    def get_time(self):
-        return time.time()
-
     def get_req_info(self,data):
         data_splitted = data.split('\n')[0].split(' ')
         method = data_splitted[0]
@@ -197,7 +191,7 @@ class HTTPServer:
 
     def path_read(self, http_path):
         http_path = urlparse(http_path)._replace(query=None).geturl()
-        http_path = urllib.parse.unquote(http_path)
+        http_path = unquote(http_path)
         req_path = Path(self.root).joinpath("." + http_path)
         req_path = req_path.resolve()
         log.debug(f"Search path: {req_path}")
