@@ -79,7 +79,6 @@ class HttpServer(unittest.TestCase):
         else:
             self.assertEqual(data, "bingo, you found it\n")
 
-
     def test_file_with_slash(self):
         """slash after filename"""
         self.conn.request("GET", "/httptest/dir2/page.html/")
@@ -100,7 +99,6 @@ class HttpServer(unittest.TestCase):
         else:
             self.assertEqual(data, "<html><body>Page Sample</body></html>\n")
 
-
     def test_file_with_spaces(self):
         """filename with spaces"""
         self.conn.request("GET", "/httptest/space%20in%20name.txt")
@@ -114,7 +112,6 @@ class HttpServer(unittest.TestCase):
             self.assertEqual(data, b"letters and spaces\n")
         else:
             self.assertEqual(data, "letters and spaces\n")
-
 
     def test_file_urlencoded(self):
         """urlencoded filename"""
@@ -130,7 +127,6 @@ class HttpServer(unittest.TestCase):
         else:
             self.assertEqual(data, "<html><body>Page Sample</body></html>\n")
 
-
     def test_large_file(self):
         """large file downloaded correctly"""
         self.conn.request("GET", "/httptest/wikipedia_russia.html")
@@ -144,7 +140,6 @@ class HttpServer(unittest.TestCase):
             self.assertIn(b"Wikimedia Foundation, Inc.", data)
         else:
             self.assertIn("Wikimedia Foundation, Inc.", data)
-
 
     def test_document_root_escaping(self):
         """document root escaping forbidden"""
@@ -169,7 +164,7 @@ class HttpServer(unittest.TestCase):
         """post method forbidden"""
         self.conn.request("POST", "/httptest/dir2/page.html")
         r = self.conn.getresponse()
-        self.assertIn(int(r.status), (400,405))
+        self.assertIn(int(r.status), (400, 405))
 
     def test_head_method(self):
         """head method support"""
@@ -219,7 +214,7 @@ class HttpServer(unittest.TestCase):
                 self.assertEqual(int(h['Content-Length']), 38)
             self.assertEqual(len(body), 0)
         else:
-            self.assertIn(int(code), (400,405))
+            self.assertIn(int(code), (400, 405))
 
     def test_filetype_html(self):
         """Content-Type for .html"""
