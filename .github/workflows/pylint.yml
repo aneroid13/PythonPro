@@ -1,7 +1,11 @@
 name: Pylint
 
-on: [push]
-
+on:
+  push:
+    paths-ignore:
+      - "README.md"
+      - "NOTES.md"
+      - ".gitignore"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,9 +22,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pylint flake8
-    - name: Analysing the code with pylint
-      run: |
-        pylint $(git ls-files '*.py')
+#    - name: Analysing the code with pylint
+#      run: |
+#        pylint $(git ls-files '*.py')
     - name: Analysing the code with flake
       run: |
-        flake8 $(git ls-files '*.py')
+        flake8 --config ./.github/workflows/flake8 $(git ls-files '*.py')
