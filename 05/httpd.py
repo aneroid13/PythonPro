@@ -1,6 +1,6 @@
 import datetime
 from urllib.parse import urlparse, unquote
-from socket import *
+from socket import socket, error, AF_INET, SOCK_STREAM
 import argparse
 import select
 import mimetypes
@@ -121,7 +121,6 @@ class HTTPServer:
     def read_events(self, socket):
         if socket is self.srv_socket:
             newsocket, (ip, port) = socket.accept()
-            #newsocket.setblocking(0)
             self.clients.append({'socket': newsocket, 'ip': ip, 'port': port})
 
     def client_events(self, socket):
@@ -159,8 +158,7 @@ class HTTPServer:
                     self.error_events(soc)
 
                 for client in self.clients:
-                    #if client['socket'].fileno():
-                    if client['socket']._closed:
+                    if client['socket']._closed:            # if client['socket'].fileno():
                         self.clients.remove(client)
                     else:
                         event_client = self.clinet_poll(client['socket'])
@@ -206,9 +204,13 @@ class HTTPServer:
             return False
 
     def get_headers(self, filepath):
-        header = {'Date': "", 'Server': "" , 'Content-Length': 0, 'Content-Type': '', 'Connection': 'close'}
-        header['Date'] = datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
-        header['Server'] = "Python/3.10"
+        header = {
+                    'Date': datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT"),
+                    'Server': "Python/3.10",
+                    'Content-Length': 0,
+                    'Content-Type': '',
+                    'Connection': 'close'
+                  }
         if filepath:
             header['Content-Length'] = Path(filepath).stat().st_size
             mimetypes.add_type("application/x-shockwave-flash", ".swf", True)
