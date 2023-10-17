@@ -74,7 +74,7 @@ class HTTPServer:
         self.index = "index.html"
         self.srv_socket = None
         self.socket_poll_timeout = 100    # in ms
-        self.serve_req = re.compile("^[GET|POST|HEAD]+ .* HTTP/1.[0|1]+\r\n.*")
+        self.serve_req = re.compile(r"^[GET|POST|HEAD]+ .* HTTP/1.[0|1]+\r\n.*")
         self.clients = []
         self.to_clients = SenderThread(workers)
         self.textanswers = {
@@ -119,25 +119,25 @@ class HTTPServer:
         poller.register(sock.fileno(), select.POLLIN | select.POLLPRI)
         return poller.poll(self.socket_poll_timeout)
 
-    def read_events(self, socket):
-        if socket is self.srv_socket:
-            newsocket, (ip, port) = socket.accept()
+    def read_events(self, sock):
+        if sock is self.srv_socket:
+            newsocket, (ip, port) = sock.accept()
             self.clients.append({'socket': newsocket, 'ip': ip, 'port': port})
 
-    def client_events(self, socket):
-        req_data = socket.recv(1000000)
+    def client_events(self, sock):
+        req_data = sock.recv(1000000)
         req_data = str(req_data.decode('utf-8'))
         if re.match(self.serve_req, req_data):      # Check that request if valid
-            self.response(socket, req_data)
+            self.response(sock, req_data)
 
-    def error_events(self, socket):
+    def error_events(self, sock):
         log.error("Connection refused or client disconnected")
-        select.poller.unregister(socket)
-        socket.close()
+        select.poller.unregister(sock)
+        sock.close()
 
     def init_server(self):
         self.srv_socket = socket(AF_INET, SOCK_STREAM)
-        self.srv_socket.setblocking(0)
+        self.srv_socket.setblocking(False)
         self.srv_socket.bind((self.HTTPAddress, self.HTTPPort))
         self.srv_socket.listen(5)
 
