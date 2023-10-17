@@ -1,0 +1,6 @@
+[appstream]
+name=CentOS Linux $releasever - AppStream
+baseurl=https://mirror.yandex.ru/centos/8-stream/AppStream/x86_64/os/
+gpgcheck=0
+enabled=1
+#gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
