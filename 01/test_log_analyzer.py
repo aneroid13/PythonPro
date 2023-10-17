@@ -33,10 +33,10 @@ class Test(unittest.TestCase):
         self.assertIsInstance(log_read_conf('./log_analyzer.conf'), dict)
 
     def test_log_string_parse(self):
-        good_string = "".join('''1.199.4.96 -  - [29/Jun/2017:03:50:22 +0300] "GET /api/v2/slot/4822/groups HTTP/1.1" 200 22 "-" ''',
-                        '''"Lynx/2.8.8dev.9 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/2.10.5" "-" "1498697422-3800516057-4708-9752773" "2a828197ae235b0b3cb" 0.157''')
-        wrong_string = "".join('''1.199.4.96 -  - [29/Jun/2017:03:50:22 +0300] "TUP /api/v2/slot/4822/groups HTTP/1.1" 200 22 "-" ''',
-                        '''"Lynx/2.8.8dev.9 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/2.10.5" "-" "1498697422-3800516057-4708-9752773" "2a828197ae235b0b3cb" 0.157''')
+        good_string =   "".join('''1.199.4.96 -  - [29/Jun/2017:03:50:22 +0300] "GET /api/v2/slot/4822/groups HTTP/1.1" 200 22 "-" ''',
+                                '''"Lynx/2.8.8dev.9 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/2.10.5" "-" "1498697422-3800516057-4708-9752773" "2a828197ae235b0b3cb" 0.157''')
+        wrong_string =  "".join('''1.199.4.96 -  - [29/Jun/2017:03:50:22 +0300] "TUP /api/v2/slot/4822/groups HTTP/1.1" 200 22 "-" ''',
+                                '''"Lynx/2.8.8dev.9 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/2.10.5" "-" "1498697422-3800516057-4708-9752773" "2a828197ae235b0b3cb" 0.157''')
         result = log_string_parse(good_string)
         self.assertIsInstance(result[0], str)
         self.assertIsInstance(result[1], float)

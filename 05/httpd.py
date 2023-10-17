@@ -211,7 +211,7 @@ class HTTPServer:
                 'Content-Length': 0,
                 'Content-Type': '',
                 'Connection': 'close'
-                }
+                 }
         if filepath:
             header['Content-Length'] = Path(filepath).stat().st_size
             mimetypes.add_type("application/x-shockwave-flash", ".swf", True)

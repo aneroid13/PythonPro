@@ -201,7 +201,7 @@ class HttpServer(unittest.TestCase):
         else:
             (proto, code, status) = statusline.split(" ")
         h = {}
-        for k,v in enumerate(headers):
+        for k, v in enumerate(headers):
             if v3:
                 (name, value) = re.split(br'\s*:\s*', v, 1)
             else:
