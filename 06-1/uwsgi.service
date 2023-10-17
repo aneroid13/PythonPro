@@ -1,0 +1,14 @@
+[Unit]
+Description=uWSGI instance run ip to weather application
+After=network.target
+
+[Service]
+#Environment=UWSGI_PORT=1771
+Environment=PATH=/usr/local/bin
+User=uwsgi
+Group=uwsgi
+ExecStart=/usr/bin/uwsgi --json /usr/local/etc/uwsgi.json
+#ExecStart=/usr/bin/uwsgi --socket 127.0.0.1:${UWSGI_PORT} --wsgi-file /usr/local/bin/ip2w.py
+
+[Install]
+WantedBy=multi-user.target

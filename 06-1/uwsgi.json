@@ -1,0 +1,9 @@
+{
+    "uwsgi": {
+        "socket": ["127.0.0.1:1771"],
+        "wsgi-file": "/usr/local/ip2w/ip2w.py",
+        "master": true,
+        "processes": 5,
+        "die-on-term": true
+    }
+}

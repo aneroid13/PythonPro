@@ -42,8 +42,8 @@ log_counter = {}
 def log_file(dir):
     max_date = 0
     log_name = None
-    reg_name = "^nginx-access-ui\.log-(\d{8})\.*(gz)*$"
-    fname = namedtuple("Log_filename", ['name','date','ext'])
+    reg_name = r"^nginx-access-ui\.log-(\d{8})\.*(gz)*$"
+    fname = namedtuple("Log_filename", ['name', 'date', 'ext'])
     for name in os.listdir(dir):
         get_name = regex.findall(reg_name, name)
         if get_name:
@@ -64,7 +64,7 @@ def log_get(logf):
 def log_string_parse(log_str: str):
     global log_req_time_total
     url, time = "", 0.0
-    tmpl = regex.compile("^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} .* \"(?:GET|POST|DELETE|PUT|HEAD|OPTIONS|-) (.*) HTTP/\d.\d\".* (\d+\.\d*)$")
+    tmpl = regex.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} .* \"(?:GET|POST|DELETE|PUT|HEAD|OPTIONS|-) (.*) HTTP/\d.\d\".* (\d+\.\d*)$")
 
     try:
         url, time = regex.findall(tmpl, log_str)[0]
@@ -73,7 +73,7 @@ def log_string_parse(log_str: str):
         log_req_time_total += time
         log.info("Log string: " + log_str)
         log.info("Log parse url string: " + url + " access time:" + str(time))
-    except IndexError as e:
+    except IndexError:
         log.warning("Wrong string format: " + log_str)
     return url, time
 
@@ -82,15 +82,16 @@ def log_statistics(log_limit: int):
     for key, val in log_counter.items():
         times = val
         log.info("Log stats. URL: " + str(key) + " list time: " + str(times))
-        url_stat.append({
-            'url': key,
-            'count': len(times),
-            'count_perc': (1 / len(log_counter)) * 100,
-            'time_max': max(times),
-            'time_sum': sum(times),
-            'time_avg': sum(times) / len(times),
-            'time_med': median(times),
-            'time_perc': (sum(times) / log_req_time_total) * 100
+        url_stat.append(
+            {
+                'url': key,
+                'count': len(times),
+                'count_perc': (1 / len(log_counter)) * 100,
+                'time_max': max(times),
+                'time_sum': sum(times),
+                'time_avg': sum(times) / len(times),
+                'time_med': median(times),
+                'time_perc': (sum(times) / log_req_time_total) * 100
             })
     url_stat.sort(key=lambda x: x['time_sum'], reverse=True)
 
@@ -150,7 +151,7 @@ def main():
             if l_url in log_counter:
                 log_counter[l_url].append(l_time)
             else:
-               log_counter[l_url] = [l_time]
+                log_counter[l_url] = [l_time]
 
         url_stat = log_statistics(current_config['REPORT_SIZE'])
         log_report(url_stat, file.date, current_config['REPORT_DIR'])
