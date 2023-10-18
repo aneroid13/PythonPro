@@ -10,6 +10,7 @@ import logging
 import logging.handlers
 from pathlib import Path
 import re
+from json import load, JSONDecodeError
 
 
 # from multiprocessing import pool
@@ -73,41 +74,11 @@ class HTTPServer:
         self.root = Path(root_folder).resolve()
         self.index = "index.html"
         self.srv_socket = None
-        self.socket_poll_timeout = 100    # in ms
+        self.socket_poll_timeout = 1    # in ms
         self.serve_req = re.compile(r"^[GET|POST|HEAD]+ .* HTTP/1.[0|1]+\r\n.*")
         self.clients = []
         self.to_clients = SenderThread(workers)
-        self.textanswers = {
-            100: "Continue",
-            101: "Switching Protocols",
-            200: "OK",
-            201: "Created",
-            202: "Accepted",
-            203: "Non-Authoritative Information",
-            204: "No Content",
-            205: "Reset Content",
-            206: "Partial Content",
-            300: "Multiple Choices",
-            301: "Moved Permanently",
-            303: "See Other",
-            304: "Not Modified",
-            305: "Use Proxy",
-            306: "Switch Proxy",
-            307: "Temporary Redirect",
-            308: "Permanent Redirect",
-            400: "Bad Request",
-            401: "Unauthorized",
-            402: "Payment Required",
-            403: "Forbidden",
-            404: "Not Found",
-            405: "Method Not Allowed",
-            406: "Not Acceptable",
-            407: "Proxy Authentication Required",
-            408: "Request Timeout",
-            409: "Conflict",
-            410: "Gone",
-            500: "Internal Server Error"
-        }
+        self.textanswers = self.read_conf("./httpcodes.conf")
 
     def srv_poll(self, mask):
         poller = select.poll()
@@ -127,8 +98,10 @@ class HTTPServer:
     def client_events(self, sock):
         req_data = sock.recv(1000000)
         req_data = str(req_data.decode('utf-8'))
-        if re.match(self.serve_req, req_data):      # Check that request if valid
+        if req_data:    # re.match(self.serve_req, req_data):      # Check that request if valid
             self.response(sock, req_data)
+        else:
+            sock.close()
 
     def error_events(self, sock):
         log.error("Connection refused or client disconnected")
@@ -137,9 +110,9 @@ class HTTPServer:
 
     def init_server(self):
         self.srv_socket = socket(AF_INET, SOCK_STREAM)
-        self.srv_socket.setblocking(False)
+        self.srv_socket.setblocking(0)
         self.srv_socket.bind((self.HTTPAddress, self.HTTPPort))
-        self.srv_socket.listen(5)
+        self.srv_socket.listen(100)    # connection buffer size
 
         self.to_clients.start()  # <- New thread coming
 
@@ -161,6 +134,7 @@ class HTTPServer:
                 for client in self.clients:
                     if client['socket']._closed:            # if client['socket'].fileno():
                         self.clients.remove(client)
+                        continue
                     else:
                         event_client = self.clinet_poll(client['socket'])
                         fd_to_socket = {client['socket'].fileno(): client['socket'], }
@@ -184,8 +158,8 @@ class HTTPServer:
         return {'method': method, 'path': path, 'version': ver}
 
     def get_req_headers(self, data):
-        headers = str(data).split('\n')[1:]
-        headers = headers.split(':', )
+        headers = data.split('\n')[1:]
+        headers = headers.split(':', maxsplit=1)
         return headers
 
     def path_read(self, http_path):
@@ -236,12 +210,25 @@ class HTTPServer:
             body = None
         elif req['method'] == 'POST':
             code = 405
+            body = None
 
-        http_response = f"HTTP/1.1 {code} {self.textanswers[code]}"
+        http_response = f"HTTP/1.1 {code} {self.textanswers[str(code)]}"
         http_headers = self.get_headers(http_path)
         http_response = "\r\n".join([http_response, http_headers, '\r\n']).encode('utf-8')
         log.debug(f"Server send to: {sock.getpeername()} \f\n Server answer : {http_response}")
         self.to_clients.send((sock, http_response, body))
+
+    def read_conf(self, conf_file: str):
+        try:
+            with open(conf_file, 'rt') as f_conf:
+                return load(f_conf)
+        except FileNotFoundError:
+            log.error(f"File not found: {conf_file}")
+        except JSONDecodeError as ex:
+            log.error(f"Wrong format, must be json. {ex}")
+        except Exception as ex:
+            log.error(str(ex))
+
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -249,7 +236,7 @@ def get_args():
     )
     parser.add_argument('-a', '--address', default="0.0.0.0", required=False, action='store', help='Input ip address')
     parser.add_argument('-p', '--port', default=8080, required=False, action='store', help='Input port')
-    parser.add_argument('-w', '--workers', default=100, required=False, action='store', help='Workers')
+    parser.add_argument('-w', '--workers', default=500, required=False, action='store', help='Workers')
     parser.add_argument('-r', '--root', default=".", required=False, action='store', help='Root folder')
     return parser.parse_args()
 
