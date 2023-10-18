@@ -98,7 +98,7 @@ class HTTPServer:
     def client_events(self, sock):
         req_data = sock.recv(1000000)
         req_data = str(req_data.decode('utf-8'))
-        if req_data:    #re.match(self.serve_req, req_data):      # Check that request if valid
+        if req_data:    # re.match(self.serve_req, req_data):      # Check that request if valid
             self.response(sock, req_data)
         else:
             sock.close()
@@ -159,7 +159,7 @@ class HTTPServer:
 
     def get_req_headers(self, data):
         headers = data.split('\n')[1:]
-        headers = headers.split(':', maxsplit = 1)
+        headers = headers.split(':', maxsplit=1)
         return headers
 
     def path_read(self, http_path):
@@ -210,6 +210,7 @@ class HTTPServer:
             body = None
         elif req['method'] == 'POST':
             code = 405
+            body = None
 
         http_response = f"HTTP/1.1 {code} {self.textanswers[str(code)]}"
         http_headers = self.get_headers(http_path)
@@ -220,7 +221,6 @@ class HTTPServer:
     def read_conf(self, conf_file: str):
         try:
             with open(conf_file, 'rt') as f_conf:
-                #print(load(f_conf))
                 return load(f_conf)
         except FileNotFoundError:
             log.error(f"File not found: {conf_file}")
