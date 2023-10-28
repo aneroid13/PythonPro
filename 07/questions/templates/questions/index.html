@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Question list</title>
+</head>
+<body>
+
+<ul>
+{% for qu in question_list %}
+    <li>
+        <h2>{{ question.header }}</h2>
+            {{ qu.text }}
+    </li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
