@@ -40,7 +40,7 @@ class Question(models.Model):
             self.get_rate(current_user).rate = -1
 
     def get_rate(self, current_user):
-        return QuestionRate.objects.filter(question=self.id, user = current_user)
+        return QuestionRate.objects.filter(question=self.id, user=current_user)
 
     def get_absolute_url(self):
         return reverse('qu:question', kwargs={'pk': self.id})
