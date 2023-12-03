@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<script type="javascript">
+    const plus_button = document.querySelector("#q_plus");
+    plus_button.addEventListener("click", plus_b);
+
+    function plus_b() {
+    {{ question.rate_increase }}
+    }
+</script>
+
+<input id="q_plus" type="button" value="[ - ]" />
+<div class="rate">
+    {{ question.rate.rate__sum }}
+</div>
+<input id="q_minus" type="button" value="[ + ]" />
+<h2>
+    {{ question.header }}
+</h2>
+<div class="text"> {{ question.text }} </div>
+<br>
+<h4>Answers:</h4>
+{% for answ in answers_list %}
+<div class="answer">{{ answ.text }}</div>
+<div class="answer">{{ answ.user }} on {{ answ.date }}</div>
+<br>
+{% endfor %}
+<form action="{{ question.get_absolute_url }}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    Your answer: <br>
+    <input type="text" name="text">
+    <input type="submit" value="Answer" />
+</form>
+{% endblock content %}

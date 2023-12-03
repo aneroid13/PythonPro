@@ -19,7 +19,7 @@ from django.urls import path, include
 #from questions import views as q_views
 
 urlpatterns = [
-    path('', include('questions.urls')),
+    path('', include('questions.urls', namespace="qu")),
     # path('question/', q_views.question),
     # path('login/', q_views.login),
     # path('ask/', q_views.ask),

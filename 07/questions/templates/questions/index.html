@@ -1,19 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Question list</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
 
 <ul>
 {% for qu in question_list %}
-    <li>
-        <h2>{{ question.header }}</h2>
-            {{ qu.text }}
+    <li class="row g-0 flex-md border rounded shadow-sm">
+        <a href='{{ qu.get_absolute_url }}'><h3 class="display-6 mb-0">{{ qu.header }}</h3></a>
+        <!--OR  <a href='{% url 'qu:question' qu.id %}'><h3 class="display-6 mb-0">{{ qu.header }}</h3></a> -->
+        <div class="mb-auto">{{ qu.text }}</div>
     </li>
 {% endfor %}
 </ul>
 
-</body>
-</html>
+{% endblock content %}
