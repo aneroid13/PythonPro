@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.http.response import HttpResponse
 from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from django.contrib.auth.views import LoginView, LogoutView
-#from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Question, Answer, CustomUser
 from .forms import NewQuestionForm, AnswerQuestion, UserRegistrationForm, UserInfo
@@ -53,14 +53,14 @@ class QuestionView(DetailView, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["answers_list"] = Answer.objects.filter(question_id = self.kwargs['pk'])
+        context["answers_list"] = Answer.objects.filter(question_id=self.kwargs['pk'])
         return context
 
 class SearchView(ListView):
     model = Question
     template_name = "questions/question_search.html"
     context_object_name = 'search_list'
-    #queryset = Question.objects.all()
+    # queryset = Question.objects.all()
 
     def post(self, request, *args, **kwargs):
         search_word = request.POST.get('search')

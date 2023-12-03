@@ -1,13 +1,13 @@
 from django.forms import ModelForm, PasswordInput
 from django.core.validators import ValidationError
-#from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from .models import Question, Answer, CustomUser
 from django.forms.fields import CharField
 
 class UserRegistrationForm(ModelForm):
     class Meta:
         model = CustomUser
-        fields = ["username", "email", "pict"] ## "first_name", "last_name"
+        fields = ["username", "email", "pict"]  # "first_name", "last_name"
 
     psw1 = CharField(label="password", widget=PasswordInput)
     psw2 = CharField(label="password confirm", widget=PasswordInput)
