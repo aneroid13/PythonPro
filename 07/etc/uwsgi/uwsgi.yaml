@@ -1,0 +1,11 @@
+uwsgi:
+    chdir: /web
+    wsgi-file: /web/hasker/wsgi.py
+    uid: nginx
+    socket: /run/nginx/uwsgi.sock
+    chown-socket: nginx:nginx
+    chmod-socket: 660
+    vacuum: true
+    master: true
+    processes: 5
+    die-on-term: true

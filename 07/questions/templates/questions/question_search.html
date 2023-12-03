@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<form action="." method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="search">
+    <input type="submit" value="Search"/>
+</form>
+
+<h4>Result:</h4>
+{% for sr in search_list %}
+<div class="search">{{ sr.header }}</div>
+<div class="search">{{ sr.text }}</div>
+<br>
+{% endfor %}
+
+{% endblock content %}
